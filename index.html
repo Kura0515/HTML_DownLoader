@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生成AIビジネススクールリニア - HTML File Downloader</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: #e8e8e8;
+      color: #1a2744;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top-bar {
+      width: 100%;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #1a2744;
+      border-bottom: 3px solid #9a7e3a;
+    }
+
+    .top-bar img {
+      height: 60px;
+      width: auto;
+    }
+
+    .top-bar .site-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #9a7e3a;
+      letter-spacing: 0.08em;
+    }
+
+    header {
+      width: 100%;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      background: #f2f2f2;
+      border-bottom: 1px solid #d0d0d0;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a2744;
+      margin-bottom: 0.4rem;
+    }
+
+    header p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 900px;
+      padding: 2rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      color: #1a2744;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .input-group input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #c0c0c0;
+      background: #fff;
+      color: #1a2744;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #9a7e3a;
+      box-shadow: 0 0 0 2px rgba(197, 165, 90, 0.2);
+    }
+
+    .editor-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #c0c0c0;
+      background: #fff;
+      min-height: 400px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .editor-tabs {
+      display: flex;
+      background: #1a2744;
+    }
+
+    .editor-tab {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+
+    .editor-tab.active {
+      color: #9a7e3a;
+      border-bottom-color: #9a7e3a;
+    }
+
+    .editor-tab:hover:not(.active) {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      background: #fff;
+      color: #1a2744;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      tab-size: 2;
+    }
+
+    textarea::placeholder {
+      color: #aaa;
+    }
+
+    .preview-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+      display: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: #1a2744;
+      color: #9a7e3a;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(26, 39, 68, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #1a2744;
+      border: 1px solid #c0c0c0;
+    }
+
+    .btn-secondary:hover {
+      border-color: #1a2744;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1a2744;
+      color: #9a7e3a;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+      border: 1px solid #9a7e3a;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.8rem;
+      color: #999;
+      padding: 0.4rem 1rem;
+      background: #f8f8f8;
+      border-top: 1px solid #eee;
+    }
+
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 1.5rem;
+      color: #999;
+      font-size: 0.8rem;
+      border-top: 1px solid #d0d0d0;
+      background: #f2f2f2;
+    }
+
+    @media (max-width: 600px) {
+      .top-bar {
+        padding: 0.8rem 1rem;
+      }
+
+      .top-bar img {
+        height: 44px;
+      }
+
+      .top-bar .site-name {
+        font-size: 0.95rem;
+      }
+
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <img src="logo.avif" alt="ロゴ">
+    <span class="site-name">生成AIビジネススクールリニア</span>
+  </div>
+  <header>
+    <h1>HTML File Downloader</h1>
+    <p>HTMLコードを貼り付けて、.htmlファイルとしてダウンロード</p>
+  </header>
+
+  <main>
+    <div class="input-group">
+      <label for="filename">ファイル名:</label>
+      <input type="text" id="filename" value="index" placeholder="ファイル名を入力">
+      <span style="color: #999;">.html</span>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-tabs">
+        <button class="editor-tab active" data-tab="code">コード</button>
+        <button class="editor-tab" data-tab="preview">プレビュー</button>
+      </div>
+      <textarea
+        id="html-input"
+        placeholder="ここにHTMLコードを貼り付けてください...&#10;&#10;例:&#10;<!DOCTYPE html>&#10;<html>&#10;<head><title>My Page</title></head>&#10;<body>&#10;  <h1>Hello World!</h1>&#10;</body>&#10;</html>"
+        spellcheck="false"
+      ></textarea>
+      <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts"></iframe>
+      <div class="char-count" id="char-count">0 文字</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="download-btn" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        </svg>
+        ダウンロード
+      </button>
+      <button class="btn btn-secondary" id="clear-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+        </svg>
+        クリア
+      </button>
+      <button class="btn btn-secondary" id="copy-btn" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/>
+        </svg>
+        コピー
+      </button>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    HTML File Downloader &mdash; ブラウザ上で完結。サーバーへのデータ送信はありません。
+  </footer>
+
+  <script>
+    const htmlInput = document.getElementById('html-input');
+    const filenameInput = document.getElementById('filename');
+    const downloadBtn = document.getElementById('download-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const charCount = document.getElementById('char-count');
+    const previewFrame = document.getElementById('preview-frame');
+    const tabs = document.querySelectorAll('.editor-tab');
+    const toast = document.getElementById('toast');
+
+    htmlInput.addEventListener('input', () => {
+      const len = htmlInput.value.length;
+      charCount.textContent = len.toLocaleString() + ' 文字';
+      downloadBtn.disabled = len === 0;
+      copyBtn.disabled = len === 0;
+    });
+
+    htmlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = htmlInput.selectionStart;
+        const end = htmlInput.selectionEnd;
+        htmlInput.value = htmlInput.value.substring(0, start) + '  ' + htmlInput.value.substring(end);
+        htmlInput.selectionStart = htmlInput.selectionEnd = start + 2;
+        htmlInput.dispatchEvent(new Event('input'));
+      }
+    });
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        if (tab.dataset.tab === 'preview') {
+          htmlInput.style.display = 'none';
+          previewFrame.style.display = 'block';
+          previewFrame.srcdoc = htmlInput.value;
+        } else {
+          htmlInput.style.display = 'block';
+          previewFrame.style.display = 'none';
+        }
+      });
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const content = htmlInput.value;
+      if (!content) return;
+
+      let name = filenameInput.value.trim() || 'index';
+      name = name.replace(/\.html?$/i, '');
+
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, content], { type: 'text/html; charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name + '.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast(name + '.html をダウンロードしました');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      htmlInput.value = '';
+      htmlInput.dispatchEvent(new Event('input'));
+      htmlInput.focus();
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[0].classList.add('active');
+      htmlInput.style.display = 'block';
+      previewFrame.style.display = 'none';
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(htmlInput.value).then(() => {
+        showToast('クリップボードにコピーしました');
+      });
+    });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    htmlInput.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      htmlInput.style.borderColor = '#9a7e3a';
+    });
+
+    htmlInput.addEventListener('dragleave', () => {
+      htmlInput.style.borderColor = '';
+    });
+
+    htmlInput.addEventListener('drop', (e) => {
+      e.preventDefault();
+      htmlInput.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file && (file.type === 'text/html' || file.name.endsWith('.html') || file.name.endsWith('.htm'))) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          htmlInput.value = ev.target.result;
+          htmlInput.dispatchEvent(new Event('input'));
+          filenameInput.value = file.name.replace(/\.html?$/i, '');
+          showToast(file.name + ' を読み込みました');
+        };
+        reader.readAsText(file);
+      }
+    });
+  </script>
+</body>
+</html>
